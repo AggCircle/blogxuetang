@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="row text-center vertical-middle-sm">
+    <h1 style="text-align:center">华夏科技学堂报名情况</h1>
+    </div>
+    &nbsp;
+    <div class="align-center">
+        <form id="yaoqing" action="filter" method="post" autocomplete="off">
+            <table id="user_table" class="table">
+                <thead class="user_list_th">
+                    <tr>
+                        <td>选择</td>
+                        <td>姓名</td>
+                        <td>年龄</td>
+                        <td>邮箱</td>
+                        <td>手机号</td>
+                        <td>活动</td>
+                        <td>状态</td>
+                    </tr>
+                </thead>
+                <tbody class="group_list">
+                 {% for blog in blogs %}
+                    <tr class="search_tr">
+                        <td><input type="checkbox" name="check_box_list" value="{{blog.id}}"></td>
+                        <td>{{blog.name}}</td>
+                        <td>{{blog.age}}</td>
+                        <td>{{blog.email}}</td>
+                        <td>{{blog.phone}}</td>
+                        <td>{{blog.article}}</td>
+                        <td>{{blog.comment}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <input type="submit" value="发送邮件">
+        </form>
+    </div>
+{% endblock %}   

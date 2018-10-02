@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    {% load staticfiles %}
+        <link rel="shortcut icon" href="{%static "image/favicon.ico" %}" />
+    <title>{% block title %}华夏科技学堂活动报名{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/pure-min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/grids-responsive-min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/blog.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}"/>
+    <script type="text/javascript" src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+</head>
+<body>
+<div id="layout" class="pure-g">
+    <!--左侧边栏 开始-->
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+        <div class="header">
+            <h1>华夏科技学堂</h1>
+            <h2 class="brand-title"><a href="{% url 'home' %}" style="text-decoration: none">最新活动</a></h2>
+            <br>
+            <h2 class="brand-title"><a href="{% url 'result' %}" style="text-decoration: none">报名查询</a></h2>
+            <br>
+            <!-- <nav class="nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        {% for category in category_list %}
+                            <a class="pure-button" href="{% url 'category_menu' id=category.id %}"
+                               style="text-decoration: none">{{ category }}</a>
+                        {% endfor %}&nbsp;
+                    </li>
+                </ul>
+                <br>
+                <h3 class="brand-tagline" style="margin: 2%">活动归档</h3>
+                <ul class="nav-list" style="margin: 2%">
+                    {% for m in months %}
+                        <li>
+                            <a href="{% url 'archives' year=m.year month=m.month %}"
+                               style="text-decoration: none">{{ m | date:'Y年m月' }}</a>
+                        </li>
+                    {% empty %}
+                        暂无归档！
+                    {% endfor %}
+                </ul>
+                <br>
+            </nav> -->
+        </div>
+    </div>
+    <!--左侧边栏 结束-->
+    <!--文章列表 开始-->
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+    <!--文章列表 结束-->
+</div>
+<div class="go-top">
+    <div class="arrow"></div>
+    <div class="stick"></div>
+</div>
+<script>
+    $(function () {
+        $(window).scroll(function () {
+            if ($(window).scrollTop() > 1000)
+                $('div.go-top').show();
+            else
+                $('div.go-top').hide();
+        });
+        $('div.go-top').click(function () {
+            $('html, body').animate({scrollTop: 0}, 500);
+        });
+    });
+</script>
+</body>
+</html>

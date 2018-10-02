@@ -1,0 +1,8 @@
+awesome-slugify==1.6.5
+Django==2.0.3
+django-jet==1.0.7
+django-summernote==0.8.8.6
+pytz==2018.3
+regex==2018.8.29
+Unidecode==0.4.21
+virtualenv==15.1.0
