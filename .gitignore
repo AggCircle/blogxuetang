@@ -1,0 +1,4 @@
+*.pyc
+uwsgi.ini
+*.log
+uwsgi.pid

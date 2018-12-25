@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+import time
 
 categories = Category.objects.all()  # 获取全部的分类对象
 tags = Tag.objects.all()  # 获取全部的标签对象
@@ -16,7 +17,7 @@ months = Article.objects.datetimes('pub_time', 'month', order='DESC')
 
 # Create your views here.
 def home(request):  # 主页
-    posts = Article.objects.filter(status='p', pub_time__isnull=False)  # 获取全部(状态为已发布，发布时间不为空)Article对象
+    posts = Article.objects.filter(status='p', pub_time__isnull=False).order_by('pub_time')  # 获取全部(状态为已发布，发布时间不为空)Article对象
     paginator = Paginator(posts, settings.PAGE_NUM)  # 每页显示数量
     page = request.GET.get('page')  # 获取URL中page参数的值
     try:
@@ -40,10 +41,10 @@ def result(request):  # 查询
             item['phone'] = info.phone
             item['email'] = info.email
             item['article'] = info.article.title
-            if info.send:
-                item['state'] = '已发送邀请'
-            elif info.verify == 'responsed':
+            if info.verify == 'responsed':
                 item['state'] = '报名成功'
+            elif info.send:
+                item['state'] = '已发送邀请'
             else:
                 item['state'] = '待管理员确认'
             apply.append(item)
@@ -158,6 +159,7 @@ def blog_choice(request):
             student = CustomerApply.objects.get(id=lable)
             blog_send(adress=student.email, ID=lable)
             CustomerApply.objects.filter(id=lable).update(send=True,comment='已发送')
+            time.sleep(0.3)
         return render(request, "customer_filter.html", {"blogs":CustomerApply.objects.all().order_by("article")})
     blogs = CustomerApply.objects.all().order_by("article")
     return render(request, "customer_filter.html",{"blogs":blogs})
@@ -166,11 +168,12 @@ def blog_choice(request):
 def blog_send(adress, ID):
 # send_mail的参数分别是  邮件标题，邮件内容，发件箱(settings.py中设置过的那个)，收件箱列表(可以发送给多个人),失败静默(若发送失败，报错提示我们)
     subject = '华夏科技学堂'
-    message = '您的信息已经通过筛选，确认参加请点击'+'http://www.hxkjxt.top/affirm?ID='+ID
+    message = '恭喜您成功报名“华夏科技学堂”解密编钟系列活动之“编钟结构巧，铸造工艺妙”，如能按时参加，请于12月21日(周五)14:00前完成确认，过时未确认自动视为放弃。确认参加请点击'+'http://www.hxkjxt.top/affirm?ID='+ID+'''
+您可登录 http://www.hxkjxt.top/result/ 查询报名信息,成功确认后若未能准时参加活动将影响您的信誉度。'''
     send_mail(
         subject,
         message,
-        'hxkjxt2018@163.com',
+        'hxkjxt@sina.com',
         [adress],
         fail_silently=False,
     )
@@ -178,5 +181,5 @@ def blog_send(adress, ID):
 # 确认报名
 def affirm(request):
     ID = request.GET['ID']
-    CustomerApply.objects.filter(id=ID).update(verify='response', comment='已确认')
-    return HttpResponse("确认成功,如不能准时参加活动请致电13161104876，否则可能影响您的信誉度，谢谢！!!")
+    CustomerApply.objects.filter(id=ID).update(verify='responsed', comment='已确认')
+    return render(request, 'affirm.html')

@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '1ek)3z+-*)(&1c&3fv=2*=lr_cyst85w&a4y#5!2m*ik@=&!p0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -89,10 +89,10 @@ DATABASES = {
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False   #是否使用TLS安全传输协议(用于在两个通信应用程序之间提供保密性和数据完整性。)
-EMAIL_HOST = 'smtp.163.com'   #发送邮件的邮箱 的 SMTP服务器，这里用了163邮箱
+EMAIL_HOST = 'smtp.sina.com'   #发送邮件的邮箱 的 SMTP服务器，这里用了163邮箱
 EMAIL_PORT = 465     #发件箱的SMTP服务器端口
-EMAIL_HOST_USER = 'hxkjxt2018@163.com'    #发送邮件的邮箱地址
-EMAIL_HOST_PASSWORD = '1qaz2wsx'         #发送邮件的邮箱密码(这里使用的是授权码)
+EMAIL_HOST_USER = 'hxkjxt@sina.com'    #发送邮件的邮箱地址
+EMAIL_HOST_PASSWORD = 'baobei689'         #发送邮件的邮箱密码(这里使用的是授权码)
 # --- Email End ---
 
 # Password validation

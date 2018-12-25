@@ -14,7 +14,7 @@
                 <tr><th>报名活动</th><th>姓名</th><th>年龄</th><th>邮箱</th><th>手机号</th><th>状态</th></tr>
             </table>
         </div>
-        <p style="color: red;text-align:left;">注意：您的状态若为“已发送邀请”请及时查看您的邮箱（由于个人邮箱安却级别设定等原因，收件箱若无信息请查看垃圾箱）并根据提示进行确认;状态为“报名成功”时说明您已经成功报名</p>
+        <p style="color: red;text-align:left;">注意：您的状态若为“已发送邀请”请及时查看您的邮箱（由于个人邮箱安全级别设定等原因，收件箱若无信息请查看垃圾箱）并根据提示进行确认;状态为“报名成功”时说明您已经成功报名</p>
     </div>
 
     <script>
@@ -34,6 +34,7 @@
 
                 success:function (data) {
                     var item;
+		    $('.table').empty();
                     if(data.details==''){
                         alert("未查到与此电话有关的报名信息。");
                         return false;
