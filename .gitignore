@@ -2,3 +2,4 @@
 uwsgi.ini
 *.log
 uwsgi.pid
+db.sqlite3
