@@ -171,7 +171,6 @@ def blog_send(adress, ID, mss):
     subject = '华夏科技学堂'
     message = '%s确认参加请点击'%mss+'http://www.hxkjxt.top/affirm?ID='+ID+'''
 您可登录 http://www.hxkjxt.top/result/ 查询报名信息,成功确认后若未能准时参加活动将影响您的信誉度。'''
-    print(message)
     send_mail(
         subject,
         message,
