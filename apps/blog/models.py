@@ -45,9 +45,12 @@ class Article(models.Model):
     status = models.CharField(verbose_name='状态', max_length=1, choices=STATUS_CHOICES, default='p')
     views = models.PositiveIntegerField(verbose_name='浏览量', default=0)
     created_time = models.DateTimeField(verbose_name='创建时间', default=now)
-    pub_time = models.DateTimeField(verbose_name='发布时间', blank=True, null=True)
+    pub_time = models.DateTimeField(verbose_name='活动时间', blank=True, null=True)
     last_mod_time = models.DateTimeField(verbose_name='修改时间', default=now)
-    category = models.ForeignKey(Category, verbose_name='分类', on_delete=models.CASCADE, blank=False, null=False)
+    deadline = models.DateTimeField(verbose_name='活动确认截止时间', blank=True, null=True)
+    activity_words = models.TextField(verbose_name='活动邮件提示语')
+    activity_site = models.TextField(verbose_name='活动地点')
+    category = models.ForeignKey(Category, verbose_name='活动系列', on_delete=models.CASCADE, blank=False, null=False)
     tags = models.ManyToManyField(Tag, verbose_name='标签集合', blank=True)
 
     # 使对象在后台显示更友好

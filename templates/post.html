@@ -58,6 +58,7 @@
             var email = $("#email").val();
             var user = $("#user").val();
             var age = $("#age").val();
+            var myReg=/^[a-zA-Z0-9_-]+@([a-zA-Z0-9]+\.)+(com|cn|net|org)$/;
             if (user == ''){
                 alert("请输入姓名");
                 return false;
@@ -66,10 +67,16 @@
                 if (age == ''){
                     alert("请输入年龄");
                     return false;
+                }else if (age>12 || age<8) {
+                    alert("孩子的年龄与活动要求的年龄不匹配,本活动适合8——12岁的儿童");
+                    return false;
                 }
                 else{
                     if (email == ''){
                         alert("请输入您的邮箱地址");
+                        return false;
+                    }else if (!myReg.test(email)) {
+                        alert("您输入的邮箱格式不正确，请检查后重新确认");
                         return false;
                     }
                     else{

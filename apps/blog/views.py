@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import time
+import datetime
 
 categories = Category.objects.all()  # 获取全部的分类对象
 tags = Tag.objects.all()  # 获取全部的标签对象
@@ -157,7 +158,7 @@ def blog_choice(request):
         check_box_list = request.POST.getlist("check_box_list")
         for lable in check_box_list:
             student = CustomerApply.objects.get(id=lable)
-            blog_send(adress=student.email, ID=lable)
+            blog_send(adress=student.email, ID=lable, mss=student.article.activity_words)
             CustomerApply.objects.filter(id=lable).update(send=True,comment='已发送')
             time.sleep(0.3)
         return render(request, "customer_filter.html", {"blogs":CustomerApply.objects.all().order_by("article")})
@@ -165,10 +166,10 @@ def blog_choice(request):
     return render(request, "customer_filter.html",{"blogs":blogs})
 
 # 发送邮件
-def blog_send(adress, ID):
+def blog_send(adress, ID, mss):
 # send_mail的参数分别是  邮件标题，邮件内容，发件箱(settings.py中设置过的那个)，收件箱列表(可以发送给多个人),失败静默(若发送失败，报错提示我们)
     subject = '华夏科技学堂'
-    message = '恭喜您成功报名“华夏科技学堂”解密编钟系列活动之“编钟结构巧，铸造工艺妙”，如能按时参加，请于12月21日(周五)14:00前完成确认，过时未确认自动视为放弃。确认参加请点击'+'http://www.hxkjxt.top/affirm?ID='+ID+'''
+    message = '%s确认参加请点击'%mss+'http://www.hxkjxt.top/affirm?ID='+ID+'''
 您可登录 http://www.hxkjxt.top/result/ 查询报名信息,成功确认后若未能准时参加活动将影响您的信誉度。'''
     send_mail(
         subject,
@@ -180,6 +181,14 @@ def blog_send(adress, ID):
 
 # 确认报名
 def affirm(request):
+    now = datetime.datetime.now().strftime("%d%H%M%S")
     ID = request.GET['ID']
-    CustomerApply.objects.filter(id=ID).update(verify='responsed', comment='已确认')
-    return render(request, 'affirm.html')
+    student=CustomerApply.objects.get(id=ID)
+    deadline = student.article.deadline.strftime("%d%H%M%S")
+    if now > deadline:
+        return HttpResponse("对不起，已过规定的最后确认时间，请留心下次活动！")
+    else:
+        stutent=CustomerApply.objects.filter(id=ID).update(verify='responsed', comment='已确认')
+        site = student.article.activity_site
+        time_active = student.article.pub_time
+        return render(request, 'affirm.html', {"site":site, "time_active":time_active})

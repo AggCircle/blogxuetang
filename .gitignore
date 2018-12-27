@@ -3,3 +3,4 @@ uwsgi.ini
 *.log
 uwsgi.pid
 db.sqlite3
+/apps/blog/migrations/
