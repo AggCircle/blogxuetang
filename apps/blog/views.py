@@ -1,13 +1,13 @@
-from django.shortcuts import render
-from apps.blog.models import Article, Category, Tag, CustomerApply
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.core.mail import send_mail
-from django.http import HttpResponse, JsonResponse
-from django.http import Http404
 from django.conf import settings
 from django.contrib import messages
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.mail import send_mail, EmailMessage
+from django.http import HttpResponse, JsonResponse, Http404
+from django.shortcuts import render
+from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from apps.blog.models import Article, Category, Tag, CustomerApply
 import time
 import datetime
 
@@ -179,12 +179,28 @@ def blog_send(adress, ID, mss):
         fail_silently=False,
     )
 
+def send_html_mail(request):
+    try:
+        subject = '华夏科技学堂'
+        html_content = loader.render_to_string(
+                         'affirm.html',               #需要渲染的html模板
+                         {
+                            'paramters': 'paramters'    #参数
+                         }
+                   )
+        msg = EmailMessage(subject, html_content, 'hxkjxt@sina.com', ['835663540@qq.com',])
+        msg.content_subtype = "html" # Main content is now text/html
+        msg.send()
+    except Exception as e:
+        return HttpResponse(e)
+    return HttpResponse("OK")
+
 # 确认报名
 def affirm(request):
-    now = datetime.datetime.now().strftime("%d%H%M%S")
+    now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     ID = request.GET['ID']
     student=CustomerApply.objects.get(id=ID)
-    deadline = student.article.deadline.strftime("%d%H%M%S")
+    deadline = student.article.deadline.strftime("%Y%m%d%H%M%S")
     if now > deadline:
         return HttpResponse("对不起，已过规定的最后确认时间，请留心下次活动！")
     else:

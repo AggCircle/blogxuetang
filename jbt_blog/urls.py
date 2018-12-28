@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^send', views.blog_send, name="blog_send"),
     url(r'^filter', views.blog_choice, name="blog_choice"),
     url(r'^affirm', views.affirm, name="affirm"),
+    path('sent/', views.send_html_mail, name='send_html'),
 ]
 
 if settings.DEBUG:
