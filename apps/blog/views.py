@@ -158,7 +158,7 @@ def blog_choice(request):
         check_box_list = request.POST.getlist("check_box_list")
         for lable in check_box_list:
             student = CustomerApply.objects.get(id=lable)
-            blog_send(adress=student.email, ID=lable, mss=student.article.activity_words)
+            send_html_mail(adress=student.email, ID=lable, mss=student.article.activity_words)
             CustomerApply.objects.filter(id=lable).update(send=True,comment='已发送')
             time.sleep(0.3)
         return render(request, "customer_filter.html", {"blogs":CustomerApply.objects.all().order_by("article")})
@@ -179,16 +179,19 @@ def blog_send(adress, ID, mss):
         fail_silently=False,
     )
 
-def send_html_mail(request):
+def send_html_mail(adress, ID, mss):
     try:
+        message = '%s确认参加请点击'%mss
+        urls = 'http://www.hxkjxt.top/affirm?ID='+ID
         subject = '华夏科技学堂'
         html_content = loader.render_to_string(
-                         'affirm.html',               #需要渲染的html模板
+                         'mail.html',               #需要渲染的html模板
                          {
-                            'paramters': 'paramters'    #参数
+                            'message': message,
+                            'urls': urls,    #参数
                          }
                    )
-        msg = EmailMessage(subject, html_content, 'hxkjxt@sina.com', ['835663540@qq.com',])
+        msg = EmailMessage(subject, html_content, 'hxkjxt@sina.com', [adress,])
         msg.content_subtype = "html" # Main content is now text/html
         msg.send()
     except Exception as e:

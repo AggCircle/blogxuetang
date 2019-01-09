@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Article, Category, Tag, CustomerApply
 from django_summernote.admin import SummernoteModelAdmin
-from .views import blog_send
+from .views import blog_send, send_html_mail
 import time
 # Register your models here.
 
@@ -10,7 +10,7 @@ admin.site.register(Tag)
 
 def send_mail(modeladmin, request, queryset):
 	for obj in queryset:
-		blog_send(adress=obj.email, ID=str(obj.id), mss=obj.article.activity_words)
+		send_html_mail(adress=obj.email, ID=str(obj.id), mss=obj.article.activity_words)
 		time.sleep(0.3)
 	queryset.update(send=True,comment='已发送')
 send_mail.short_description = "发送邮件"
