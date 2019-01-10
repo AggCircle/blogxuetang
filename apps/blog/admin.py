@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Article, Category, Tag, CustomerApply
 from django_summernote.admin import SummernoteModelAdmin
 from .views import blog_send, send_html_mail
+from .models import Article, Category, Tag, CustomerApply
 import time
 # Register your models here.
 
