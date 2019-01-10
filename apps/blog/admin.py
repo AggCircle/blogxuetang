@@ -10,7 +10,7 @@ admin.site.register(Tag)
 
 def send_mail(modeladmin, request, queryset):
 	for obj in queryset:
-		send_html_mail(adress=obj.email, ID=str(obj.id), mss=obj.article.activity_words)
+		send_html_mail(adress=obj.email, ID=str(obj.id), mss=obj.article.activity_words, time=obj.article.pub_time)
 		time.sleep(0.3)
 	queryset.update(send=True,comment='已发送')
 send_mail.short_description = "发送邮件"
