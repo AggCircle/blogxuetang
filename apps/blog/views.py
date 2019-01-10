@@ -179,18 +179,18 @@ def blog_send(adress, ID, mss):
         fail_silently=False,
     )
 
-def send_html_mail(adress, ID, mss):
-    message = '%s确认参加请点击'%mss
+def send_html_mail(adress, ID, mss, time):
     urls = 'http://www.hxkjxt.top/affirm?ID='+ID
-    subject = '华夏科技学堂'
+    subject = '请确认是否参加中国科技馆华夏科技学堂活动'
     html_content = loader.render_to_string(
                      'mail.html',               #需要渲染的html模板
                      {
-                        'message': message,
+                        'message': mss,
+                        'activity_time': time,
                         'urls': urls,    #参数
                      }
                )
-    msg = EmailMessage(subject, html_content, 'hxkjxt@sina.com', [adress,])
+    msg = EmailMessage(subject, html_content, 'hxkjxt2018@163.com', [adress,])
     msg.content_subtype = "html" # Main content is now text/html
     msg.send()
 
