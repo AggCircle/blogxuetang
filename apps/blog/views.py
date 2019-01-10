@@ -160,7 +160,7 @@ def blog_choice(request):
             student = CustomerApply.objects.get(id=lable)
             send_html_mail(adress=student.email, ID=lable, mss=student.article.activity_words)
             CustomerApply.objects.filter(id=lable).update(send=True,comment='已发送')
-            time.sleep(0.3)
+            time.sleep(1)
         return render(request, "customer_filter.html", {"blogs":CustomerApply.objects.all().order_by("article")})
     blogs = CustomerApply.objects.all().order_by("article")
     return render(request, "customer_filter.html",{"blogs":blogs})
@@ -180,23 +180,19 @@ def blog_send(adress, ID, mss):
     )
 
 def send_html_mail(adress, ID, mss):
-    try:
-        message = '%s确认参加请点击'%mss
-        urls = 'http://www.hxkjxt.top/affirm?ID='+ID
-        subject = '华夏科技学堂'
-        html_content = loader.render_to_string(
-                         'mail.html',               #需要渲染的html模板
-                         {
-                            'message': message,
-                            'urls': urls,    #参数
-                         }
-                   )
-        msg = EmailMessage(subject, html_content, 'hxkjxt@sina.com', [adress,])
-        msg.content_subtype = "html" # Main content is now text/html
-        msg.send()
-    except Exception as e:
-        return HttpResponse(e)
-    return HttpResponse("OK")
+    message = '%s确认参加请点击'%mss
+    urls = 'http://www.hxkjxt.top/affirm?ID='+ID
+    subject = '华夏科技学堂'
+    html_content = loader.render_to_string(
+                     'mail.html',               #需要渲染的html模板
+                     {
+                        'message': message,
+                        'urls': urls,    #参数
+                     }
+               )
+    msg = EmailMessage(subject, html_content, 'hxkjxt@sina.com', [adress,])
+    msg.content_subtype = "html" # Main content is now text/html
+    msg.send()
 
 # 确认报名
 def affirm(request):
@@ -205,7 +201,7 @@ def affirm(request):
     student=CustomerApply.objects.get(id=ID)
     deadline = student.article.deadline.strftime("%Y%m%d%H%M%S")
     if now > deadline:
-        return HttpResponse("对不起，已过规定的最后确认时间，请留心下次活动！")
+        return render(request, 'timeout.html')
     else:
         stutent=CustomerApply.objects.filter(id=ID).update(verify='responsed', comment='已确认')
         site = student.article.activity_site
