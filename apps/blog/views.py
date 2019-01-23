@@ -3,11 +3,14 @@ from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.mail import send_mail, EmailMessage
 from django.http import HttpResponse, JsonResponse, Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from apps.blog.models import Article, Category, Tag, CustomerApply
+from apps.login.models import User
+from apps.guestbook.models import Message
+from apps.guestbook.views import message_event, message_save
 import time
 import datetime
 
@@ -16,7 +19,6 @@ tags = Tag.objects.all()  # 获取全部的标签对象
 months = Article.objects.datetimes('pub_time', 'month', order='DESC')
 
 
-# Create your views here.
 def home(request):  # 主页
     posts = Article.objects.filter(status='p', pub_time__isnull=False).order_by('pub_time')  # 获取全部(状态为已发布，发布时间不为空)Article对象
     paginator = Paginator(posts, settings.PAGE_NUM)  # 每页显示数量
@@ -29,30 +31,29 @@ def home(request):  # 主页
         post_list = paginator.page(paginator.num_pages)
     return render(request, 'home.html', {'post_list': post_list, 'category_list': categories, 'months': months})
 
-
 def result(request):  # 查询
-    if request.method == 'POST':
-        phone = request.POST.get('phone')
-        infos = CustomerApply.objects.filter(phone=phone)
-        apply = []
-        for info in infos:
-            item = {}
-            item['name'] = info.name
-            item['age'] = info.age
-            item['phone'] = info.phone
-            item['email'] = info.email
-            item['article'] = info.article.title
-            if info.verify == 'responsed':
-                item['state'] = '报名成功'
-            elif info.send:
-                item['state'] = '已发送邀请'
-            else:
-                item['state'] = '待管理员确认'
-            apply.append(item)
-        response = JsonResponse({"details": apply})
-        return response
-
-    return render(request, 'detail.html')
+    if request.session.get('is_login',None):
+        try:
+            user_id = request.session.get('user_id',None)
+            infos = CustomerApply.objects.filter(user_id=user_id)
+            details = []
+            for info in infos:
+                item = {}
+                item['name'] = info.name
+                item['article'] = info.article.title
+                if info.verify == 'responsed':
+                    item['state'] = '报名成功'
+                elif info.send:
+                    item['state'] = '已发送邀请'
+                    item['id'] = info.id
+                else:
+                    item['state'] = '待管理员确认'
+                details.append(item)
+            return render(request, 'detail.html',{'details': details})
+        except:
+            return render(request, 'detail.html')
+    else:
+        return redirect('/login/')
 
 
 def detail(request, id):
@@ -60,6 +61,8 @@ def detail(request, id):
         post = Article.objects.get(id=str(id))
         post.viewed()  # 更新浏览次数
         tags = post.tags.all()
+        messages = message_event(article=str(id))
+        count = messages.count()
         next_post = post.next_article()  # 上一篇文章对象
         prev_post = post.prev_article()  # 下一篇文章对象
     except Article.DoesNotExist:
@@ -69,10 +72,12 @@ def detail(request, id):
         {
             'post': post,
             'tags': tags,
+            'count': count,
             'category_list': categories,
             'next_post': next_post,
             'prev_post': prev_post,
-            'months': months
+            'months': months,
+            'messages' : messages
         }
     )
 
@@ -137,19 +142,26 @@ def archives(request, year, month):
 @require_POST
 @csrf_exempt
 def blog_save(request):
-    blogs = CustomerApply.objects.all()
-    name = request.POST.get('user')
-    age = request.POST.get('age')
-    email = request.POST.get('email')
-    phone = request.POST.get('phone')
-    id_activity = request.POST.get('id')
-    article = Article.objects.filter(id=id_activity)[0]
-    for blog in blogs:
-        if blog.phone == phone and blog.article == article:
-            return HttpResponse('{"status":"fail"}', content_type='application/json')
-    student = CustomerApply(name=name, age=age, email=email, phone=phone, article=article)
-    student.save()
-    return HttpResponse('{"status":"success"}', content_type='application/json')
+    if request.session.get('is_login',None):
+        user_id = request.session.get('user_id',None)
+        user_info = User.objects.filter(id=user_id)
+
+        blogs = CustomerApply.objects.all()
+        name = user_info[0].name
+        age = user_info[0].age
+        email = user_info[0].email
+        phone = user_info[0].phone
+        id_activity = request.POST.get('id')
+        article = Article.objects.get(id=id_activity)
+        user = User.objects.get(id=user_id)
+        for blog in blogs:
+            if blog.phone == phone and blog.article == article:
+                return HttpResponse('{"status":"fail"}', content_type='application/json')
+        student = CustomerApply(name=name, age=age, email=email, phone=phone, user_id=user, article=article)
+        student.save()
+        return HttpResponse('{"status":"success"}', content_type='application/json')
+    else:
+        return HttpResponse('{"status":"login"}', content_type='application/json')
 
 # 报名筛选
 @csrf_exempt
@@ -195,9 +207,13 @@ def send_html_mail(adress, ID, mss, time):
     msg.send()
 
 # 确认报名
+@csrf_exempt
 def affirm(request):
+    if request.POST:
+        ID = request.POST.get('affirm_id')
+    else:
+        ID = request.GET['ID']
     now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    ID = request.GET['ID']
     student=CustomerApply.objects.get(id=ID)
     deadline = student.article.deadline.strftime("%Y%m%d%H%M%S")
     if now > deadline:

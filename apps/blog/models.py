@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from apps.login.models import User
 
 
 # Create your models here.
@@ -86,6 +87,7 @@ class CustomerApply(models.Model):
     send = models.BooleanField(default=False)
     verify = models.CharField(max_length=50,default='noresponse')
     article = models.ForeignKey(Article, verbose_name='活动', on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, verbose_name='用户', on_delete=models.CASCADE)
     comment = models.CharField(max_length=50,default='未发送')
 
     def __str__(self):

@@ -15,31 +15,35 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from apps.blog import views
 from django.conf.urls import include
 from django.conf.urls import url
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
-
+from apps.blog.views import home, detail, search_category, search_tag, archives, blog_save, result, blog_send, blog_choice, affirm, send_html_mail
+from apps.login.views import login, register, logout
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
-    path('home/', views.home, name='home'),
-    path('articles/<int:id>/', views.detail, name='detail'),
-    path('category/<int:id>/', views.search_category, name='category_menu'),
-    path('tag/<str:tag>/', views.search_tag, name='search_tag'),
-    path('archives/<str:year>/<str:month>', views.archives, name='archives'),
+    path('', home, name='home'),
+    path('home/', home, name='home'),
+    path('articles/<int:id>/', detail, name='detail'),
+    path('category/<int:id>/', search_category, name='category_menu'),
+    path('tag/<str:tag>/', search_tag, name='search_tag'),
+    path('archives/<str:year>/<str:month>', archives, name='archives'),
     path('summernote/', include('django_summernote.urls')),
     path('jet/', include('jet.urls', 'jet')),  # Django JET URLS
     path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
-    url(r'^save', views.blog_save, name="blog_save"),
-    url(r'^result', views.result, name='result'),
-    url(r'^send', views.blog_send, name="blog_send"),
-    url(r'^filter', views.blog_choice, name="blog_choice"),
-    url(r'^affirm', views.affirm, name="affirm"),
-    path('sent/', views.send_html_mail, name='send_html'),
+    url(r'^save', blog_save, name="blog_save"),
+    url(r'^result', result, name='result'),
+    url(r'^send', blog_send, name="blog_send"),
+    url(r'^filter', blog_choice, name="blog_choice"),
+    url(r'^affirm', affirm, name="affirm"),
+    path('sent/', send_html_mail, name='send_html'),
+    url(r'^login/', login),
+    url(r'^register/', register),
+    url(r'^logout/', logout),
+    url(r'^guestbook/', include('apps.guestbook.urls',namespace='guestbook')),
 ]
 
 if settings.DEBUG:

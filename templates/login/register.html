@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}注册{% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}"/>
+{% endblock %}
+{% block content %}
+<div class="container">
+	<section id="content">
+		<form action="register" method="post">
+ 
+		    {% csrf_token %}
+
+		    <h1>欢迎注册</h1>
+		    {% if message %}
+		      	<div class="alert alert-warning">{{ message }}</div>
+		    {% endif %}
+		    <div>
+		        {{ register_form.username}}
+		    </div>
+		    <div>
+		        {{ register_form.age }}
+		    </div>
+		    <div>
+		        {{ register_form.email }}
+		    </div>
+		    <div>
+		        {{ register_form.phone }}
+		    </div>
+		    <input type="submit" value="提交" class="btn btn-primary" id="js-btn-register"/>
+		</form><!-- form -->
+	</section><!-- content -->
+</div>
+{% endblock %}
