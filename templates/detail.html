@@ -2,49 +2,30 @@
 {% load static %}
 {% block content %}
     <div style="text-align:center">
-        <div class="post-container">
-            <form>
-                {% csrf_token %}
-                <input type="text" id="phone" placeholder="报名的电话号" required="required"/>
-                <input type="button" value="查询" id="apply"/>
-            </form>
-        </div>
-        <div>
-            <table class="table"> 
-                <tr><th>报名活动</th><th>姓名</th><th>年龄</th><th>邮箱</th><th>手机号</th><th>状态</th></tr>
-            </table>
-        </div>
-        <p style="color: red;text-align:left;">注意：您的状态若为“已发送邀请”请及时查看您的邮箱（由于个人邮箱安全级别设定等原因，收件箱若无信息请查看垃圾箱）并根据提示进行确认;状态为“报名成功”时说明您已经成功报名</p>
+        <table class="table"> 
+            <tr>
+                <th>报名活动</th>
+                <th>姓名</th>
+                <th>状态</th>
+                <th>确认参加</th>
+            </tr>
+            {% for detail in details %}
+            <tr>
+                <td>{{detail.article}}</td>
+                <td>{{detail.name}}</td>
+                <td>{{detail.state}}</td>
+                <td>
+                {% if detail.id %}
+                    <form action="affirm" method="post">
+                        <p hidden><input type="text" name="affirm_id" placeholder="用户名" value={{detail.id}} /></p>
+                        <input type="submit" id="affirm" value='确认参加'>
+                    </form>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
+    <p style="color: red;text-align:left;">说明：您的状态为“已发送邀请”时，确认参加一栏将会出现确认按钮，请及时确认（确认时间一般为活动前一天的16:00之前）;状态为“报名成功”时说明您已经成功报名</p>
 
-    <script>
-        $('input#apply').click(function(){
-            var phone = $("#phone").val();
-            if (phone == ''){
-                alert("请输入要查询的手机号。");
-                return false;
-            }
-            $.ajax({
-                url:"/result",
-                method:"POST",
-                data:{
-                    "phone":$("#phone").val(),
-                    "csrfmiddlewaretoken":$('[name="csrfmiddlewaretoken"]').val()
-                },
-
-                success:function (data) {
-                    var item;
-		    $('.table').empty();
-                    if(data.details==''){
-                        alert("未查到与此电话有关的报名信息。");
-                        return false;
-                    }
-                    for(var i = 0; i < data.details.length; i++){
-                        item="<tr><td>"+data.details[i].article+"</td><td>"+data.details[i].name+"</td><td>"+data.details[i].age+"</td><td>"+data.details[i].email+"</td><td>"+data.details[i].phone+"</td><td>"+data.details[i].state+"</td></tr>"; 
-                        $('.table').append(item); 
-                    }
-                }
-            })
-        });
-    </script>
 {% endblock %}   

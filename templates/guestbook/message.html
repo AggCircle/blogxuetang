@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}留言板{% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/guestbook.css' %}"/>
+{% endblock %}
+{% block content %}
+<div class="">
+    <div class="form">
+        <form class="layui-form" action="/guestbook/save/" method="POST">
+            <div class="">
+                <textarea name="content" placeholder="既然来了，就说几句" class="layui-textarea"></textarea>
+            </div>
+            <div class="" style="text-align: right;">
+                <input type="submit" class="layui-btn definite" value="留言">
+            </div>
+        </form>
+    </div>
+    <div class="volume">
+        全部留言 <span>10</span>
+    </div>        
+    <div class="">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="review-version">
+            <p class="tit"><span class="name">{{ message.user }}</span><span class="data">{{ message.c_time|date:'Y-m-d H:i:s' }}</span></p>
+            <p class="ct">{{ message.content }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="4">无数据</td>
+        </tr>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

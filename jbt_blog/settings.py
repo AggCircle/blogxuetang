@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.blog',
     'django_summernote',
+    'apps.login',
+    'apps.guestbook',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +74,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'jbt_blog.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -209,12 +210,18 @@ JET_SIDE_MENU_ITEMS = [  # A list of application or custom item dicts
 
     {'label': '附件管理', 'app_label': 'django_summernote', 'items': [
         {'label': '附件列表', 'name': 'attachment'},
+    ]},
 
+    {'label': '外部用户管理', 'app_label': 'login', 'items': [
+        {'name': 'user', 'permissions': ['auth.user']},
+    ]},
+
+    {'label': '留言管理', 'app_label': 'guestbook', 'items': [
+        {'name': 'message', 'permissions': ['auth.user']},
     ]},
 
     {'label': '权限管理', 'items': [
         {'name': 'auth.user', 'permissions': ['auth.user']},
         {'name': 'auth.group', 'permissions': ['auth.user']},
-
     ]},
 ]
